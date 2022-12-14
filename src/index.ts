@@ -1,3 +1,4 @@
 import FullscreenImage from "./FullscreenImage"
+import renderLightbox from "./renderLightbox"
 
-export { FullscreenImage }
+export { FullscreenImage, renderLightbox }
