@@ -8,7 +8,7 @@ export interface FullscreenImageProp extends Omit<JSX.ImgHTMLAttributes<HTMLImag
     /**
      * 作为位置参照的元素
      */
-    img: HTMLImageElement
+    img?: HTMLImageElement
 }
 const modalPadding = 10
 
@@ -39,11 +39,11 @@ export default function FullscreenImage(props: FullscreenImageProp) {
      */
     const [width, setWidth] = createSignal(0)
     const refreshPos = () => {
-        setRect(localProp.img.getBoundingClientRect())
+        setRect(localProp.img?.getBoundingClientRect())
     }
     const resize = () => {
         const height = rect()!.height//要求与stillStyle一致
-        const { naturalWidth, naturalHeight } = localProp.img
+        const { naturalWidth, naturalHeight } = localProp.img!
 
         let targetHeight: number
         let targetWidth: number
@@ -81,7 +81,7 @@ export default function FullscreenImage(props: FullscreenImageProp) {
     createComputed(
         on(() => localProp.img,
             () => {
-                awaitImage(localProp.img).then(open)
+                localProp.img && awaitImage(localProp.img).then(open)
             }, { defer: true }))
     onMount(() => {
         window.addEventListener('scroll', refreshPos)
