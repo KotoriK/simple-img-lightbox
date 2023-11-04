@@ -18,7 +18,7 @@ export default defineConfig({
     },
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      formats: ['es', 'cjs'],
+      formats: ['es'],
       // the proper extensions will be added
       fileName: 'index'
     }
