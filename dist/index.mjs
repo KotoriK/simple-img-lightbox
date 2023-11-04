@@ -50,7 +50,7 @@ function useTimeout() {
   return [set, clear];
 }
 
-const _tmpl$$1 = /*#__PURE__*/template(`<div></div>`, 2);
+const _tmpl$$1 = /*#__PURE__*/template(`<div>`);
 const styleModal = css({
   /*CSS contributor 
   作者：heibaimeng
@@ -96,7 +96,7 @@ function Modal(props) {
     defer: true
   }));
   return (() => {
-    const _el$ = _tmpl$$1.cloneNode(true);
+    const _el$ = _tmpl$$1();
     spread(_el$, mergeProps({
       get onClick() {
         return localProp.onClose;
@@ -118,7 +118,7 @@ function Modal(props) {
   })();
 }
 
-const _tmpl$ = /*#__PURE__*/template(`<img>`, 1);
+const _tmpl$ = /*#__PURE__*/template(`<img>`);
 const modalPadding = 10;
 const styleBase = css({
   position: 'absolute',
@@ -225,7 +225,7 @@ function FullscreenImage(props) {
       setFullscreen(false);
     },
     get children() {
-      const _el$ = _tmpl$.cloneNode(true);
+      const _el$ = _tmpl$();
       className(_el$, styleBase);
       spread(_el$, mergeProps({
         get style() {
