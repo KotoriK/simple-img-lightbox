@@ -7,7 +7,8 @@ import FullscreenImage from './src/FullscreenImage';
 const [img, setImg] = createSignal<HTMLImageElement | undefined>(undefined, { equals: false })
 const candidateUrl: string[] = [
     ...(await Promise.all(Object.values(import.meta.glob('./picture/*.jpg', { as: 'url' })).map(fn => fn()))),
-    'https://cdn.jsdelivr.net/gh/jmhobbs/cultofthepartyparrot.com/parrots/hd/thumbsupparrot.gif'
+    'https://cdn.jsdelivr.net/gh/jmhobbs/cultofthepartyparrot.com/parrots/hd/thumbsupparrot.gif',
+    'https://cdn.jsdelivr.net/gh/AOMediaCodec/av1-avif@master/testFiles/Netflix/avif/hdr_cosmos01000_cicp9-16-0_lossless.avif'
 ]
 function randomPicture() {
     return candidateUrl[Math.round((candidateUrl.length - 1) * Math.random())]
