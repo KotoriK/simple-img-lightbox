@@ -1,27 +1,15 @@
 import { onCleanup } from "solid-js"
 
 export default function useTimeout() {
-    let timers: number[] = []
-    let timersTicked : number[] = []
+    let timer:ReturnType<typeof setTimeout> | undefined
     const clear = () => {
-        timers.forEach(id => clearTimeout(id))
-        timers = []
-        timersTicked = []
+        clearTimeout(timer)
+    }
+    const set = (handler: () => any, timeout?: number) => {
+        clear()
+        timer = setTimeout(handler,timeout)
     }
     onCleanup(clear)
-    const set = (handler: () => any, timeout?: number) => {
-        const timer = setTimeout(
-            () => {
-                handler()
 
-                if(timers.length=== timersTicked.length +1 ) {
-                    clear()
-                }else{
-                    timersTicked.push(timer)
-                }
-            }, timeout)
-        timers.push(timer)
-    }
-
-    return [set, clear] as const
+    return set
 }
