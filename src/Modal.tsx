@@ -15,7 +15,7 @@ const styleModal = css({
     justifyContent: "center",
     backgroundColor: "#0000",
     transition: "all 500ms ease-in",
-    "& > div": {
+    "&>div": {
         margin: "0.8rem",
         overflow: "auto",
         maxHeight: "98vh",

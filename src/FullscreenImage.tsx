@@ -95,8 +95,8 @@ export default function FullscreenImage(props: FullscreenImageProp) {
             ctx.clearRect(0, 0, ref!.width, ref!.height)
         }
     }, props.img)
-    createEffect(()=>{
-        if(!fullscreen()) return
+    createEffect(() => {
+        if (!fullscreen()) return
         const ctx = ref!.getContext('2d')!
         const [targetWidth, targetHeight] = targetSize()!
         ctx.clearRect(0, 0, ref!.width, ref!.height)
