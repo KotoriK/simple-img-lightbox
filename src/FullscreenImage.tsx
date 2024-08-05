@@ -43,19 +43,9 @@ export default function FullscreenImage(props: FullscreenImageProp) {
     const [enableTransition, setEnableTransition] = createSignal(false)
     const clientSize = useDocumentClientSize()
     const refreshPos = () => {
-        if (!localProp.img) return
         setRect(localProp.img?.getBoundingClientRect())
     }
 
-    /**
-    * 图片原始纵横比下的宽度
-    */
-    const width = () => {
-        if (!rect()) return 0
-        const height = rect()!.height//要求与stillStyle一致
-        const { naturalWidth, naturalHeight } = localProp.img!
-        return height * naturalWidth / naturalHeight
-    }
     const targetSize = createMemo(() => {
         if (!localProp.img) return [0, 0] as const
         const { naturalWidth, naturalHeight } = localProp.img
@@ -77,38 +67,40 @@ export default function FullscreenImage(props: FullscreenImageProp) {
     let ref: HTMLCanvasElement | undefined
 
     createEffect((prev) => {
-        if (props.img !== prev && props.img) {
+        if (localProp.img !== prev && localProp.img) {
             const ctx = ref!.getContext('2d')!
-
-            awaitImage(props.img!)
+            setEnableTransition(false)
+            awaitImage(localProp.img!)
                 .then(() => {
-                    setEnableTransition(false)
                     refreshPos()
-                    ctx.drawImage(props.img!, 0, 0, ...targetSize()!)
+                    ctx.drawImage(localProp.img!, 0, 0, ...targetSize()!)
                     if (!fullscreen()) {
-                        batch(() => {
+                        // 等待前述样式提交
+                        setTimeout(() => {
                             setEnableTransition(true)
                             setFullscreen(true)
-                        })
+                        }, 0)
                     }
                 })
             ctx.clearRect(0, 0, ref!.width, ref!.height)
         }
-    }, props.img)
+    }, localProp.img)
     createEffect(() => {
         if (!fullscreen()) return
-        const ctx = ref!.getContext('2d')!
         const [targetWidth, targetHeight] = targetSize()!
+        const ctx = ref!.getContext('2d')!
         ctx.clearRect(0, 0, ref!.width, ref!.height)
         ref!.width = targetWidth
         ref!.height = targetHeight
-        ctx.drawImage(props.img!, 0, 0, ...targetSize()!)
+        ctx.drawImage(props.img!, 0, 0, targetWidth, targetHeight)
     })
-    onMount(() => {
-        window.addEventListener('scroll', refreshPos)
-    })
-    onCleanup(() => {
-        window.removeEventListener('scroll', refreshPos)
+    createEffect(() => {
+        if (fullscreen()) {
+            window.addEventListener('scroll', refreshPos)
+            onCleanup(() => {
+                window.removeEventListener('scroll', refreshPos)
+            })
+        }
     })
 
     return <Modal
@@ -131,10 +123,14 @@ export default function FullscreenImage(props: FullscreenImageProp) {
                     get transform() {
                         const [targetWidth, targetHeight] = targetSize()!
                         if (fullscreen()) {
-                            return `translate(${(document.documentElement.clientWidth - targetWidth) / 2}px,${(document.documentElement.clientHeight - targetHeight) / 2}px)`
+                            const [clientWidth, clientHeight] = clientSize()
+                            return `translate(${(clientWidth - targetWidth) / 2}px,${(clientHeight - targetHeight) / 2}px)`
                         } else {
+                            const { naturalWidth, naturalHeight } = localProp.img!
+                            const ratio = naturalWidth / naturalHeight
+
                             const height = (rect()!.height)
-                            const scaleX = width()
+                            const scaleX = ratio * height
                                 / targetWidth
                             const scaleY = height / targetHeight
                             return `translate(${rect()!.x}px,${rect()!.y}px) scale(${scaleX},${scaleY})`

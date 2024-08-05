@@ -8,11 +8,7 @@ const styleModal = css({
     bottom: 0,
     left: 0,
     right: 0,
-    width: "100%",
     zIndex: 9999,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
     backgroundColor: "#0000",
     transition: "all 500ms ease-in",
     "&>div": {
