@@ -1,8 +1,10 @@
 /* @refresh reload */
 import { css } from '@emotion/css';
-import { createSignal, For, from, observable } from 'solid-js';
+import { createSignal, For, observable } from 'solid-js';
 import { render } from 'solid-js/web';
 import FullscreenImage from './src/FullscreenImage';
+import { renderLightbox } from './src';
+import Gallery from './src/Gallery';
 
 const [img, setImg] = createSignal<HTMLImageElement | undefined>(undefined, { equals: false })
 const candidateUrl: string[] = [
@@ -14,8 +16,8 @@ function randomPicture() {
     return candidateUrl[Math.round((candidateUrl.length - 1) * Math.random())]
 }
 const pictures = document.createElement('div')
-const container = document.createElement('div')
-document.body.append(pictures, container)
+const container = document.body
+document.body.append(pictures)
 
 const styleImageList = css({
 
@@ -30,16 +32,20 @@ const styleItem = css({
     maxWidth: '100%',
     maxHeight: '100%'
 })
+
+const handleImgClick = (e: MouseEvent) => {
+    setImg((e.target as HTMLImageElement))
+}
 render(() => <div class={styleImageList}>
     <For each={new Array(100).fill(0)}>
         {item => <div>
             <img class={styleItem} src={randomPicture()}
-                onClick={(e) => setImg((e.target as HTMLImageElement))} />
+                onClick={handleImgClick} />
         </div>}
     </For>
 </div>, pictures);
 
-render(() => <FullscreenImage src={img()?.src} img={img()!} />, container);
+render(() => <FullscreenImage img={img()!} slotAfter={<Gallery images={Array.from(document.querySelectorAll(`.${styleImageList} img`))} curr={img()!} onChange={setImg} />} />, container);
 
 
 observable(img).subscribe(console.log)
