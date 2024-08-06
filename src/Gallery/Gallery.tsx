@@ -1,6 +1,7 @@
 import { css } from "@emotion/css"
 import { createEffect, createSignal, onCleanup, onMount } from "solid-js"
 import { GalleryProps } from "./interface"
+import useTimeout from "../useTimeout"
 
 const styleButton = css({
     backgroundColor: 'rgb(0,0,0,0.6)',
@@ -40,7 +41,6 @@ function GalleryMoveButton(props: { toRight?: boolean, disabled?: boolean, onCli
         class={styleButton}
         data-right={props.toRight || undefined}
         onClick={(e) => props.disabled ? e.stopPropagation() : props.onClick(e)}
-
     >
         {props.toRight ? "►" : "◄"}
     </button>
@@ -51,13 +51,25 @@ const styleIndicator = css({
     bottom: 0,
     right: 0,
     color: '#fff',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: '#0008',
     padding: '0.5rem',
     borderRadius: '0.5rem',
-
+    opacity: 0.5,
+    transition: 'all 0.2s',
+    "&.moving,&:hoverd": {
+        opacity: 1
+    }
 })
 function PositionIndicator(props: { curr: number, total: number, delta?: number }) {
-    return <div class={styleIndicator}>{props.curr}/{props.total}</div>
+    const setTimeout = useTimeout()
+    const [moving, setMoving] = createSignal(false)
+    createEffect(() => {
+        if (props.delta) {
+            setMoving(true)
+            setTimeout(() => setMoving(false), 500)
+        }
+    })
+    return <div class={styleIndicator} classList={{ moving: moving() }}>{props.curr}/{props.total}</div>
 }
 
 export default function Gallery(props: GalleryProps) {
