@@ -2,9 +2,7 @@
 import { css } from '@emotion/css';
 import { createSignal, For, observable } from 'solid-js';
 import { render } from 'solid-js/web';
-import FullscreenImage from './src/FullscreenImage';
-import { renderLightbox } from './src';
-import Gallery from './src/Gallery';
+import { renderLightbox, Gallery, FullscreenImage } from './src';
 
 const [img, setImg] = createSignal<HTMLImageElement | undefined>(undefined, { equals: false })
 const candidateUrl: string[] = [
