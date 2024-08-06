@@ -111,28 +111,29 @@ export default function FullscreenImage(props: FullscreenImageProp) {
     >
         <Show when={showSlot()} > {localProp.slotBefore}</Show>
         <canvas
-            ref={ref}
             class={styleBase}
-            style={rect() && targetSize() ?
+            style={
                 {
-                    get transition() { return enableTransition() ? 'transform 0.2s ease-in-out' : undefined },
+                    transition: enableTransition() ? 'transform 0.2s ease-in-out' : undefined,
                     get transform() {
                         const [targetWidth, targetHeight] = targetSize()!
                         if (fullscreen()) {
                             const [clientWidth, clientHeight] = clientSize()
                             return `translate(${(clientWidth - targetWidth) / 2}px,${(clientHeight - targetHeight) / 2}px)`
                         } else {
+                            if (!rect()) return ''
+                            const { x, y, height } = rect()!
                             const { naturalWidth, naturalHeight } = localProp.img!
                             const ratio = naturalWidth / naturalHeight
 
-                            const height = (rect()!.height)
                             const scaleX = ratio * height
                                 / targetWidth
                             const scaleY = height / targetHeight
-                            return `translate(${rect()!.x}px,${rect()!.y}px) scale(${scaleX},${scaleY})`
+                            return `translate(${x}px,${y}px) scale(${scaleX},${scaleY})`
                         }
                     },
-                } : undefined}
+                }}
+            ref={ref}
             onClick={(e) => e.stopPropagation()}
             onTransitionEnd={() => {
                 setEnableTransition(false)
