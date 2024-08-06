@@ -1,6 +1,6 @@
 import { css } from "@emotion/css";
 import { awaitImage } from "await-res";
-import { batch, createEffect, createMemo, createRenderEffect, createSignal, onCleanup, onMount, Show, splitProps, untrack } from "solid-js";
+import { createEffect, createMemo, createSignal, onCleanup, onMount, Show, splitProps } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import { Modal } from "./Modal";
 
@@ -50,14 +50,11 @@ export default function FullscreenImage(props: FullscreenImageProp) {
         if (!localProp.img) return [0, 0] as const
         const { naturalWidth, naturalHeight } = localProp.img
         const [clientWidth, clientHeight] = clientSize()
-        let targetHeight: number
-        let targetWidth: number
-        targetHeight = clientHeight - (modalPadding * 4)
-        targetWidth = targetHeight * naturalWidth / naturalHeight
+        let targetHeight = clientHeight - (modalPadding * 4)
+        let targetWidth = targetHeight * naturalWidth / naturalHeight
 
-        const availWidth = clientWidth
-        if (targetWidth > availWidth) {
-            targetWidth = availWidth - (modalPadding * 4)
+        if (targetWidth > clientWidth) {
+            targetWidth = clientWidth - (modalPadding * 4)
             targetHeight = targetWidth / naturalWidth * naturalHeight
         }
         return [targetWidth, targetHeight] as const
@@ -72,9 +69,9 @@ export default function FullscreenImage(props: FullscreenImageProp) {
             setEnableTransition(false)
             awaitImage(localProp.img!)
                 .then(() => {
-                    refreshPos()
                     ctx.drawImage(localProp.img!, 0, 0, ...targetSize()!)
                     if (!fullscreen()) {
+                        refreshPos()
                         // 等待前述样式提交
                         setTimeout(() => {
                             setEnableTransition(true)
@@ -106,19 +103,18 @@ export default function FullscreenImage(props: FullscreenImageProp) {
     return <Modal
         open={fullscreen()}
         onClose={() => {
+            refreshPos()
             setEnableTransition(true)
             setFullscreen(false)
         }}
         delay={200}
     >
         <Show when={showSlot()} > {localProp.slotBefore}</Show>
-
         <canvas
             ref={ref}
+            class={styleBase}
             style={rect() && targetSize() ?
                 {
-                    get width() { return targetSize()![0] + 'px' },
-                    get height() { return targetSize()![1] + 'px' },
                     get transition() { return enableTransition() ? 'transform 0.2s ease-in-out' : undefined },
                     get transform() {
                         const [targetWidth, targetHeight] = targetSize()!
@@ -137,8 +133,7 @@ export default function FullscreenImage(props: FullscreenImageProp) {
                         }
                     },
                 } : undefined}
-            class={styleBase}
-            onClick={(e) => untrack(fullscreen) && e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
             onTransitionEnd={() => {
                 setEnableTransition(false)
             }}
